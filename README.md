@@ -20,13 +20,20 @@ It gives a unified menu over common cybersecurity, OSINT, networking, forensics,
 - self-update using git
 - About panel with GitHub / Discord identity
 
-## Quick start
+## Installation
 
 ```bash
 git clone https://github.com/vireline/laplace-nexus-cli.git
 cd laplace-nexus-cli
 chmod +x laplace.sh
 ./laplace.sh
+
+## Install globally
+ 
+cd laplace-nexus-cli
+chmod +x install.sh
+./install.sh
+laplace
 
 ## Changelog
 
