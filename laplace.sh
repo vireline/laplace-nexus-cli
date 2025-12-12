@@ -934,7 +934,8 @@ update_from_repo() {
             echo
             git -C "$SCRIPT_DIR" pull
             echo
-            echo -e "${ACCENT3}If updates were applied, restart Laplace.${RESET}"
+            echo -e "${ACCENT3}Laplace has been updated.${RESET}"
+            echo -e "${MUTED}Restart Laplace to apply the new version.${RESET}"
             pause
             ;;
         *)

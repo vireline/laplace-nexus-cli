@@ -20,6 +20,11 @@ It gives a unified menu over common cybersecurity, OSINT, networking, forensics,
 - self-update using git
 - About panel with GitHub / Discord identity
 
+### One-line install (recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vireline/laplace-nexus-cli/main/install.sh | bash
+
 ## Installation
 
 ```bash
