@@ -1,0 +1,3 @@
+web|gobuster|Directory and vhost brute-forcer.|gobuster dir -u http://target -w wordlist.txt
+osint|amass|Subdomain enumeration tool.|amass enum -d example.com
+network|whatweb|Identify technologies used by a website.|whatweb https://example.com

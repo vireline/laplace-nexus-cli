@@ -35,6 +35,18 @@ chmod +x install.sh
 ./install.sh
 laplace
 
+## Plugins
+
+Laplace can load tools from plugin files stored in the repo:
+- `plugins/*.plugin`
+Format (one per line):
+category|tool|description|example
+Example:
+web|gobuster|Directory brute-forcer.|gobuster dir -u http://target
+ -w wordlist.txt
+Plugin entries are read-only inside the UI and must be edited by modifying the plugin file.
+
+
 ## Changelog
 
 ### v0.3.1

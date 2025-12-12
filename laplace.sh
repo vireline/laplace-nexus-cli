@@ -23,6 +23,8 @@ LAPLACE_VERSION="0.3.1"
 # Script directory (needed for update system)
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
+# Plugins directory (The CLI automatically discovers and loads all .plugin files in this directory)
+PLUGINS_DIR="${SCRIPT_DIR}/plugins"
 
 # ------------ colours & themes ----------
 
@@ -298,7 +300,7 @@ tool_menu() {
 
 # ------------ custom tools system --------
 
-declare -gA CT_TOOL CT_DESC CT_EX CT_CAT CT_LINE
+declare -gA CT_TOOL CT_DESC CT_EX CT_CAT CT_LINE CT_SRC
 CUSTOM_COUNT=0
 
 init_tools_config() {
@@ -312,9 +314,11 @@ load_custom_tools() {
     CT_EX=()
     CT_CAT=()
     CT_LINE=()
+    CT_SRC=()
     local idx=1
     local lineno=0
 
+    # 1) user custom tools from ~/.laplace_tools.conf (deletable)
     while IFS='|' read -r category tool desc example; do
         lineno=$((lineno+1))
         [ -z "$tool" ] && continue
@@ -323,11 +327,30 @@ load_custom_tools() {
         CT_DESC[$idx]="$desc"
         CT_EX[$idx]="$example"
         CT_LINE[$idx]=$lineno
+        CT_SRC[$idx]="user"
         idx=$((idx+1))
     done < "$TOOLS_CONFIG_FILE"
 
+    # 2) plugin tools from ./plugins/*.plugin (read-only)
+    if [ -d "$PLUGINS_DIR" ]; then
+        for f in "$PLUGINS_DIR"/*.plugin; do
+            [ -e "$f" ] || continue
+            while IFS='|' read -r category tool desc example; do
+                [ -z "$tool" ] && continue
+                CT_CAT[$idx]="$category"
+                CT_TOOL[$idx]="$tool"
+                CT_DESC[$idx]="$desc"
+                CT_EX[$idx]="$example"
+                CT_LINE[$idx]=0
+                CT_SRC[$idx]="plugin"
+                idx=$((idx+1))
+            done < "$f"
+        done
+    fi
+
     CUSTOM_COUNT=$((idx-1))
 }
+
 
 add_custom_tool() {
     header
@@ -368,7 +391,7 @@ delete_custom_tool() {
     echo -e "${ACCENT3}${BOLD}Delete Custom Tool${RESET}"
     echo
     for i in $(seq 1 "$CUSTOM_COUNT"); do
-        echo -e "${ACCENT3}${i})${RESET} [${CT_CAT[$i]}] ${CT_TOOL[$i]} – ${CT_DESC[$i]}"
+        echo -e "${ACCENT3}${i})${RESET} [${CT_CAT[$i]}] ${CT_TOOL[$i]} – ${CT_DESC[$i]} (${CT_SRC[$i]})"
     done
     echo
     read -rp "Number to remove (0 to cancel): " n
@@ -379,6 +402,14 @@ delete_custom_tool() {
 
     if ! [[ "$n" =~ ^[0-9]+$ ]] || [ "$n" -lt 1 ] || [ "$n" -gt "$CUSTOM_COUNT" ]; then
         echo "Invalid selection."
+        pause
+        return
+    fi
+
+        if [ "${CT_SRC[$n]}" = "plugin" ]; then
+        echo
+        echo "That entry comes from a plugin file and cannot be deleted here."
+        echo "Edit the plugin file in: $PLUGINS_DIR"
         pause
         return
     fi
