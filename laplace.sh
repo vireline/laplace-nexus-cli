@@ -2,7 +2,7 @@
 
 #########################################################
 # LAPLACE – the unified command nexus
-# A blue-themed, extensible CLI hub for security tools
+# A extensible CLI hub for security tools
 #########################################################
 
 # ------------ global paths -------------
@@ -16,6 +16,7 @@ SETTINGS_FILE="${HOME}/.laplace_settings"
 GITHUB_USER="vireline"
 DISCORD_USER="vireline"
 GITHUB_REPO_URL="https://github.com/vireline/laplace-nexus-cli"
+RELEASES_URL="https://github.com/vireline/laplace-nexus-cli/releases/latest"
 
 # Versioning
 LAPLACE_VERSION="0.3.1"
@@ -42,8 +43,14 @@ PASSWORD_HASH=""
 
 apply_theme() {
     case "$THEME" in
+        blue)
+            ACCENT1="\e[38;5;39m"
+            ACCENT2="\e[38;5;81m"
+            ACCENT3="\e[38;5;45m"
+            MUTED="\e[38;5;245m"
+            ;;
         violet)
-            ACCENT1="\e[38;5;135m"
+            ACCENT1="\e[38;5;171m"
             ACCENT2="\e[38;5;177m"
             ACCENT3="\e[38;5;141m"
             MUTED="\e[38;5;244m"
@@ -53,6 +60,30 @@ apply_theme() {
             ACCENT2="\e[38;5;252m"
             ACCENT3="\e[38;5;246m"
             MUTED="\e[38;5;243m"
+            ;;
+        ice)
+            ACCENT1="\e[38;5;117m"
+            ACCENT2="\e[38;5;159m"
+            ACCENT3="\e[38;5;195m"
+            MUTED="\e[38;5;250m"
+            ;;
+        neon)
+            ACCENT1="\e[38;5;51m"
+            ACCENT2="\e[38;5;201m"
+            ACCENT3="\e[38;5;190m"
+            MUTED="\e[38;5;244m"
+            ;;
+        sakura)
+            ACCENT1="\e[38;5;218m"
+            ACCENT2="\e[38;5;213m"
+            ACCENT3="\e[38;5;175m"
+            MUTED="\e[38;5;250m"
+            ;;
+        solarized)
+            ACCENT1="\e[38;5;136m"
+            ACCENT2="\e[38;5;37m"
+            ACCENT3="\e[38;5;65m"
+            MUTED="\e[38;5;244m"
             ;;
         *)
             THEME="blue"
@@ -126,6 +157,25 @@ startup_animation() {
     done
     header
 }
+
+check_latest_release() {
+    command -v curl >/dev/null 2>&1 || return
+
+    # Follow redirect and extract tag from final URL
+    local final url tag
+    final="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "$RELEASES_URL" 2>/dev/null || true)"
+    # final looks like .../releases/tag/v0.3.1
+    tag="${final##*/}"
+    [ -z "$tag" ] && return
+
+    if [ "$tag" != "v$LAPLACE_VERSION" ] && [ "$tag" != "$LAPLACE_VERSION" ]; then
+        echo -e "${ACCENT1}[!] Update available:${RESET} ${MUTED}latest=${tag}  current=v${LAPLACE_VERSION}${RESET}"
+        echo -e "${MUTED}Use About → Pull update from repository.${RESET}"
+        echo
+        sleep 1.2
+    fi
+}
+
 
 check_installed() {
     local tool="$1"
@@ -641,7 +691,7 @@ settings_menu() {
             echo -e "${MUTED}Password protection:${RESET} disabled"
         fi
         echo
-        echo -e "${ACCENT3}1)${RESET} Change theme (blue / violet / mono)"
+        echo -e "${ACCENT3}1)${RESET} Change theme (blue / violet / mono / ice / neon / sakura / solarized)"
         echo -e "${ACCENT3}2)${RESET} Toggle auto-install missing tools"
         echo -e "${ACCENT3}3)${RESET} Set / change password"
         echo -e "${ACCENT3}4)${RESET} Disable password protection"
@@ -651,19 +701,38 @@ settings_menu() {
 
         case "$c" in
             1)
-                read -rp "Theme (blue/violet/mono) ▸ " t
-                case "$t" in
-                    blue|violet|mono)
-                        THEME="$t"
-                        apply_theme
-                        save_settings
-                        ;;
-                    *)
-                        echo "Unknown theme."
-                        pause
-                        ;;
+                header
+                echo -e "${ACCENT3}${BOLD}Theme selection${RESET}"
+                echo
+                echo -e "${ACCENT3}1)${RESET} blue"
+                echo -e "${ACCENT3}2)${RESET} violet"
+                echo -e "${ACCENT3}3)${RESET} mono"
+                echo -e "${ACCENT3}4)${RESET} ice"
+                echo -e "${ACCENT3}5)${RESET} neon"
+                echo -e "${ACCENT3}6)${RESET} sakura"
+                echo -e "${ACCENT3}7)${RESET} solarized"
+                echo -e "${ACCENT3}0)${RESET} back"
+                echo
+                read -rp "Select ▸ " tn
+
+                case "$tn" in
+                    1) THEME="blue" ;;
+                    2) THEME="violet" ;;
+                    3) THEME="mono" ;;
+                    4) THEME="ice" ;;
+                    5) THEME="neon" ;;
+                    6) THEME="sakura" ;;
+                    7) THEME="solarized" ;;
+                    0) return ;;
+                    *) echo "Invalid option."; pause; return ;;
                 esac
+
+                apply_theme
+                save_settings
+                echo -e "${ACCENT2}Theme set to:${RESET} ${ACCENT3}${THEME}${RESET}"
+                pause
                 ;;
+
             2)
                 if [ "$AUTO_INSTALL" -eq 1 ]; then
                     AUTO_INSTALL=0
