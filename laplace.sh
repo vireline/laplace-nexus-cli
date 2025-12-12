@@ -18,7 +18,7 @@ DISCORD_USER="vireline"
 GITHUB_REPO_URL="https://github.com/vireline/laplace-nexus-cli"
 
 # Versioning
-LAPLACE_VERSION="0.3.0"
+LAPLACE_VERSION="0.3.1"
 
 # Script directory (needed for update system)
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
@@ -143,6 +143,7 @@ apt_package_for_tool() {
         burpsuite) echo "burpsuite" ;;
         sqlmap) echo "sqlmap" ;;
         ffuf) echo "ffuf" ;;
+        gobuster) echo "gobuster" ;;
         nuclei) echo "nuclei" ;;
         nmap) echo "nmap" ;;
         masscan) echo "masscan" ;;
@@ -448,7 +449,7 @@ populate_registry() {
     register_tool "sqlmap" "Automated SQL injection." "sqlmap -u 'http://target/page.php?id=1' --batch"
     register_tool "ffuf" "Fast web fuzzer for dirs/params." "ffuf -w wordlist.txt -u http://target/FUZZ"
     register_tool "nuclei" "Template-based vuln scanner." "nuclei -u https://target.com -severity medium,high,critical"
-
+    register_tool "gobuster" "Directory and vhost brute-forcer." "gobuster dir -u http://target -w wordlist.txt"
     register_tool "nmap" "Port & service scanner." "nmap -sC -sV -O target"
     register_tool "masscan" "Ultra-fast port scanner." "masscan -p1-65535 target --rate 10000"
     register_tool "netdiscover" "ARP-based host discovery." "netdiscover -r 192.168.1.0/24"
@@ -683,6 +684,7 @@ menu_web() {
         echo -e "${ACCENT3}1)${RESET} burpsuite   – Intercepting proxy"
         echo -e "${ACCENT3}2)${RESET} sqlmap      – SQL injection automation"
         echo -e "${ACCENT3}3)${RESET} ffuf        – Fuzzer for dirs/params"
+        echo -e "${ACCENT3}4)${RESET} gobuster    – Dir/vhost brute force"
         echo -e "${ACCENT3}4)${RESET} nuclei      – Template vuln scanner"
         echo -e "${ACCENT3}0)${RESET} Back"
         echo
@@ -691,7 +693,8 @@ menu_web() {
             1) tool_menu "burpsuite" "Intercept, edit and replay HTTP/S traffic." "burpsuite" ;;
             2) tool_menu "sqlmap" "Automate discovery and exploitation of SQL injection." "sqlmap -u 'http://target/page.php?id=1' --batch" ;;
             3) tool_menu "ffuf" "Brute-force directories or parameters with wordlists." "ffuf -w wordlist.txt -u http://target/FUZZ" ;;
-            4) tool_menu "nuclei" "Run templates to scan for vulnerabilities quickly." "nuclei -u https://target.com -severity medium,high,critical" ;;
+            4) tool_menu "gobuster" "Bruteforce directories or vhosts against a target." "gobuster dir -u http://target -w wordlist.txt" ;;
+            5) tool_menu "nuclei" "Run templates to scan for vulnerabilities quickly." "nuclei -u https://target.com -severity medium,high,critical" ;;
             0) break ;;
             *) echo "Invalid option."; beep; pause ;;
         esac
