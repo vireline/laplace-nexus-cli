@@ -20,37 +20,41 @@ It gives a unified menu over common cybersecurity, OSINT, networking, forensics,
 - self-update using git
 - About panel with GitHub / Discord identity
 
-### One-line install (recommended)
-
-```bash
+# One-line install (recommended)
+```
 curl -fsSL https://raw.githubusercontent.com/vireline/laplace-nexus-cli/main/install.sh | bash
+```
 
 ## Installation
 
-```bash
+```
 git clone https://github.com/vireline/laplace-nexus-cli.git
 cd laplace-nexus-cli
 chmod +x laplace.sh
 ./laplace.sh
+```
 
 ## Install globally
- 
+
+```
 cd laplace-nexus-cli
 chmod +x install.sh
 ./install.sh
 laplace
+```
 
 ## Plugins
 
 Laplace can load tools from plugin files stored in the repo:
 - `plugins/*.plugin`
+
 Format (one per line):
 category|tool|description|example
+
 Example:
 web|gobuster|Directory brute-forcer.|gobuster dir -u http://target
  -w wordlist.txt
 Plugin entries are read-only inside the UI and must be edited by modifying the plugin file.
-
 
 ## Changelog
 
